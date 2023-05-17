@@ -23,7 +23,12 @@ let package = Package(
         ),
         .target(
             name: "Frida",
-            dependencies: ["libfrida-core"]
+            dependencies: ["libfrida-core"],
+            // Necessary for libfrida-core. We cannot provide dependencies otherwise.
+            // See also: https://github.com/apple/swift-package-manager/issues/4449
+            linkerSettings: [
+                .linkedLibrary("resolv"),
+            ]
         ),
         .testTarget(
             name: "FridaTests",
