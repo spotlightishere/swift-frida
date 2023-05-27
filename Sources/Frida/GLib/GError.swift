@@ -8,12 +8,8 @@
 import CoreFrida
 import Foundation
 
-/// Allows throwing GErrors as normal errors.
-extension GError: Error {}
-
-/// Even though GErrors have domains, codes, and messages like NSErrors, Swift's error protocol only defines a message.
-/// In order to allow for readability, we mock up a localized description including all of these.
-extension GError: LocalizedError {
+/// Allows converting a GError to our FridaErrors type.
+extension GError {
     /// Converts the GQuark of this error to a usable string for our message.
     func quarkDomain() -> String {
         if let quarkDomainPtr = g_quark_to_string(domain) {
@@ -32,7 +28,8 @@ extension GError: LocalizedError {
         }
     }
 
-    public var errorDescription: String? {
-        "GError: code \(code), domain \(quarkDomain()): \(errorMessage())"
+    /// Converts a GError to the FridaErrors gError enum case.
+    var fridaError: FridaError {
+        .gError(domain: quarkDomain(), code: Int(code), message: errorMessage())
     }
 }
